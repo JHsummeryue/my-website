@@ -43,7 +43,7 @@ collections:
             hint: '添加、删除或编辑照片'
             fields:
               - { label: '标题', name: 'title', widget: 'string', hint: '照片的名称' }
-              - { label: '拍摄日期', name: 'date', widget: 'date', format: 'YYYY-MM-DD' }
+              - { label: '拍摄日期', name: 'date', widget: 'date', format: 'YYYY-MM-DD', date_format: 'YYYY-MM-DD' }
               - { label: '分类', name: 'category', widget: 'select', options: ['风景', '人像', '街拍', '静物', '旅行', '其他'], default: '风景' }
               - { label: '照片文件', name: 'file', widget: 'image', hint: '上传照片，建议宽度不超过 2000px', required: true }
               - { label: '描述文字', name: 'description', widget: 'text', required: false, hint: '几句话描述这张照片' }
@@ -91,6 +91,6 @@ collections:
             summary: '{{fields.date}} · {{fields.title}}'
             hint: '添加、删除或编辑日记'
             fields:
-              - { label: '日期', name: 'date', widget: 'date', format: 'YYYY-MM-DD' }
+              - { label: '日期', name: 'date', widget: 'date', format: 'YYYY-MM-DD', date_format: 'YYYY-MM-DD' }
               - { label: '标题', name: 'title', widget: 'string' }
               - { label: '内容', name: 'content', widget: 'text', hint: '日记正文' }
