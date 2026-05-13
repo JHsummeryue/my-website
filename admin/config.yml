@@ -1,0 +1,90 @@
+# ====================================
+# Decap CMS 配置文件
+# 管理后台的配置就在这里
+# 一般情况下你不需要修改它
+# ====================================
+
+# 后端：Git Gateway（通过 Netlify 连接 GitHub）
+backend:
+  name: git-gateway
+  branch: main
+
+# 照片上传设置：上传到 photos/ 文件夹
+media_folder: 'photos'
+public_folder: '/photos'
+
+# 允许上传的文件类型
+media_allowed_extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic']
+
+# ====================================
+# 内容类型定义
+# ====================================
+collections:
+  # ---------- 摄影作品 ----------
+  - name: 'photos'
+    label: '📷 摄影作品'
+    label_singular: '照片'
+    description: '管理你的摄影照片'
+    create: false
+    editor:
+      preview: false
+    files:
+      - name: 'photos_data'
+        label: '所有照片'
+        file: 'data/photos.json'
+        fields:
+          - label: '照片列表'
+            name: 'entries'
+            widget: 'list'
+            hint: '添加、删除或编辑照片'
+            fields:
+              - { label: '标题', name: 'title', widget: 'string', hint: '照片的名称' }
+              - { label: '拍摄日期', name: 'date', widget: 'date', format: 'YYYY-MM-DD', date_format: 'YYYY-MM-DD' }
+              - { label: '分类', name: 'category', widget: 'select', options: ['风景', '人像', '街拍', '静物', '旅行', '其他'], default: ['风景'] }
+              - { label: '照片文件', name: 'file', widget: 'image', hint: '上传照片，建议宽度不超过 2000px', required: true }
+              - { label: '描述文字', name: 'description', widget: 'text', required: false, hint: '几句话描述这张照片' }
+
+  # ---------- 读书摘抄 ----------
+  - name: 'books'
+    label: '📖 读书摘抄'
+    label_singular: '摘抄'
+    description: '管理你的读书摘抄'
+    create: false
+    editor:
+      preview: false
+    files:
+      - name: 'books_data'
+        label: '所有摘抄'
+        file: 'data/books.json'
+        fields:
+          - label: '摘抄列表'
+            name: 'entries'
+            widget: 'list'
+            hint: '添加、删除或编辑摘抄'
+            fields:
+              - { label: '书名', name: 'title', widget: 'string' }
+              - { label: '作者', name: 'author', widget: 'string' }
+              - { label: '标签', name: 'tags', widget: 'list', hint: '如：小说、散文、哲学（回车添加）' }
+              - { label: '摘抄内容', name: 'notes', widget: 'text', hint: '摘抄的文字内容' }
+
+  # ---------- 日常日记 ----------
+  - name: 'diary'
+    label: '✍️ 日常日记'
+    label_singular: '日记'
+    description: '管理你的日常日记'
+    create: false
+    editor:
+      preview: false
+    files:
+      - name: 'diary_data'
+        label: '所有日记'
+        file: 'data/diary.json'
+        fields:
+          - label: '日记列表'
+            name: 'entries'
+            widget: 'list'
+            hint: '添加、删除或编辑日记'
+            fields:
+              - { label: '日期', name: 'date', widget: 'date', format: 'YYYY-MM-DD', date_format: 'YYYY-MM-DD' }
+              - { label: '标题', name: 'title', widget: 'string' }
+              - { label: '内容', name: 'content', widget: 'text', hint: '日记正文' }

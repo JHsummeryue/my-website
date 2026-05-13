@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日常日记 - 我的个人网站</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">我的小站</div>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="gallery.html">摄影</a></li>
+      <li><a href="books.html">读书</a></li>
+      <li><a href="diary.html" class="active">日记</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section class="page-header fade-in">
+    <h1>日常日记</h1>
+    <p>生活碎片的记录，时光的注脚</p>
+  </section>
+
+  <div class="container">
+    <div class="timeline" id="timeline"></div>
+    <div class="empty-state" id="diaryEmpty" style="display:none;">
+      <p>✍️ 还没有日记，去管理后台添加吧</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2024 我的个人网站</p>
+</footer>
+
+<script>
+// ============================================
+// 日记页逻辑 — 从 JSON 加载数据
+// ============================================
+
+const timeline = document.getElementById('timeline');
+const diaryEmpty = document.getElementById('diaryEmpty');
+let diary = [];
+
+function renderDiary() {
+  if (diary.length === 0) {
+    timeline.innerHTML = '';
+    diaryEmpty.style.display = 'block';
+    return;
+  }
+  diaryEmpty.style.display = 'none';
+  const sorted = [...diary].sort((a, b) => b.date.localeCompare(a.date));
+  timeline.innerHTML = sorted.map(entry => `
+    <div class="timeline-item fade-in">
+      <div class="timeline-date">${entry.date}</div>
+      <h3>${entry.title}</h3>
+      <div class="content">${entry.content}</div>
+    </div>
+  `).join('');
+}
+
+fetch('data/diary.json')
+  .then(r => r.json())
+  .then(data => {
+    diary = data.entries || [];
+    renderDiary();
+  })
+  .catch(() => { diaryEmpty.style.display = 'block'; });
+</script>
+
+</body>
+</html>

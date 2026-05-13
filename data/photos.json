@@ -1,0 +1,25 @@
+{
+  "entries": [
+    {
+      "title": "示例照片 - 黄昏",
+      "date": "2024-12-01",
+      "category": "风景",
+      "file": "example-1.jpg",
+      "description": "在这里写上照片的描述文字。"
+    },
+    {
+      "title": "示例照片 - 街角",
+      "date": "2024-11-20",
+      "category": "街拍",
+      "file": "example-2.jpg",
+      "description": "午后阳光洒在街角。"
+    },
+    {
+      "title": "示例照片 - 花",
+      "date": "2024-11-15",
+      "category": "静物",
+      "file": "example-3.jpg",
+      "description": "春天的花。"
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>摄影作品 - 我的个人网站</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== 导航栏 ===== -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">我的小站</div>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="gallery.html" class="active">摄影</a></li>
+      <li><a href="books.html">读书</a></li>
+      <li><a href="diary.html">日记</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section class="page-header fade-in">
+    <h1>摄影作品</h1>
+    <p>用镜头记录世界的美好</p>
+  </section>
+
+  <div class="container">
+    <!-- 分类筛选按钮 -->
+    <div class="filters" id="filters"></div>
+
+    <!-- 照片网格 -->
+    <div class="photo-grid" id="photoGrid"></div>
+
+    <!-- 空状态 -->
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <p>📷 还没有照片，去管理后台添加吧</p>
+    </div>
+  </div>
+</main>
+
+<!-- ===== 灯箱 ===== -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">&times;</button>
+  <button class="lightbox-prev" id="lightboxPrev">&#10094;</button>
+  <button class="lightbox-next" id="lightboxNext">&#10095;</button>
+  <div class="lightbox-content">
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption">
+      <h3 id="lightboxTitle"></h3>
+      <span class="date" id="lightboxDate"></span>
+      <p class="desc" id="lightboxDesc"></p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2024 我的个人网站</p>
+</footer>
+
+<script>
+// ============================================
+// 照片页逻辑 — 从 JSON 加载数据
+// 照片内容在管理后台编辑，不需要改这个文件
+// ============================================
+
+const grid = document.getElementById('photoGrid');
+const filtersEl = document.getElementById('filters');
+const emptyState = document.getElementById('emptyState');
+
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+const lightboxTitle = document.getElementById('lightboxTitle');
+const lightboxDate = document.getElementById('lightboxDate');
+const lightboxDesc = document.getElementById('lightboxDesc');
+
+let currentIndex = 0;
+let filteredPhotos = [];
+let photos = [];
+
+// 统一处理图片路径
+function imgPath(file) {
+  if (!file) return '';
+  if (file.startsWith('photos/') || file.startsWith('/photos/') || file.startsWith('http')) return file;
+  return 'photos/' + file;
+}
+
+// 获取所有分类
+function getCategories() {
+  const cats = new Set();
+  photos.forEach(p => cats.add(p.category));
+  return ['全部', ...Array.from(cats)];
+}
+
+// 渲染筛选按钮
+function renderFilters() {
+  const cats = getCategories();
+  filtersEl.innerHTML = cats.map(cat =>
+    `<button class="filter-btn${cat === '全部' ? ' active' : ''}" data-cat="${cat}">${cat}</button>`
+  ).join('');
+  filtersEl.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtersEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterPhotos(btn.dataset.cat);
+    });
+  });
+}
+
+// 筛选照片
+function filterPhotos(category) {
+  filteredPhotos = category === '全部' ? [...photos] : photos.filter(p => p.category === category);
+  renderGrid();
+}
+
+// 渲染网格
+function renderGrid() {
+  if (filteredPhotos.length === 0) {
+    grid.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+  emptyState.style.display = 'none';
+  grid.innerHTML = filteredPhotos.map((photo, index) => `
+    <div class="photo-item fade-in" data-index="${index}">
+      <img src="${imgPath(photo.file)}" alt="${photo.title}" loading="lazy"
+           onerror="this.alt='[请添加照片]'; this.style.opacity='0.3'">
+      <div class="overlay">
+        <h4>${photo.title}</h4>
+        <span>${photo.date}</span>
+      </div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.photo-item').forEach(item => {
+    item.addEventListener('click', () => openLightbox(parseInt(item.dataset.index)));
+  });
+}
+
+// 灯箱
+function openLightbox(index) {
+  if (!filteredPhotos.length) return;
+  currentIndex = index;
+  const p = filteredPhotos[index];
+  lightboxImg.src = imgPath(p.file);
+  lightboxImg.alt = p.title;
+  lightboxTitle.textContent = p.title;
+  lightboxDate.textContent = p.date;
+  lightboxDesc.textContent = p.description || '';
+  lightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function navigateLightbox(dir) {
+  const total = filteredPhotos.length;
+  openLightbox(((currentIndex + dir) % total + total) % total);
+}
+
+// ---- 加载数据 ----
+fetch('data/photos.json')
+  .then(r => r.json())
+  .then(data => {
+    photos = data.entries || [];
+    renderFilters();
+    filterPhotos('全部');
+  })
+  .catch(() => {
+    emptyState.style.display = 'block';
+    emptyState.querySelector('p').textContent = '📷 还没有照片，去管理后台添加吧';
+  });
+
+// ---- 事件绑定 ----
+document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+document.getElementById('lightboxPrev').addEventListener('click', () => navigateLightbox(-1));
+document.getElementById('lightboxNext').addEventListener('click', () => navigateLightbox(1));
+
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+document.addEventListener('keydown', e => {
+  if (!lightbox.classList.contains('active')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navigateLightbox(-1);
+  if (e.key === 'ArrowRight') navigateLightbox(1);
+});
+
+// 触摸滑动
+let tx = 0;
+lightbox.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+lightbox.addEventListener('touchend', e => {
+  const d = tx - e.changedTouches[0].clientX;
+  if (Math.abs(d) > 50) navigateLightbox(d > 0 ? 1 : -1);
+});
+</script>
+
+</body>
+</html>

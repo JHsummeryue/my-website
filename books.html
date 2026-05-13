@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>读书摘抄 - 我的个人网站</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">我的小站</div>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="gallery.html">摄影</a></li>
+      <li><a href="books.html" class="active">读书</a></li>
+      <li><a href="diary.html">日记</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section class="page-header fade-in">
+    <h1>读书摘抄</h1>
+    <p>记录那些触动心弦的文字</p>
+  </section>
+
+  <div class="container">
+    <div class="filters" id="tagFilters"></div>
+    <div class="books-grid" id="booksGrid"></div>
+    <div class="empty-state" id="bookEmpty" style="display:none;">
+      <p>📖 还没有读书摘抄，去管理后台添加吧</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2024 我的个人网站</p>
+</footer>
+
+<script>
+// ============================================
+// 摘抄页逻辑 — 从 JSON 加载数据
+// ============================================
+
+const booksGrid = document.getElementById('booksGrid');
+const tagFilters = document.getElementById('tagFilters');
+const bookEmpty = document.getElementById('bookEmpty');
+
+let filteredBooks = [];
+let books = [];
+
+function getAllTags() {
+  const tags = new Set();
+  books.forEach(b => b.tags.forEach(t => tags.add(t)));
+  return ['全部', ...Array.from(tags)];
+}
+
+function renderTagFilters() {
+  const allTags = getAllTags();
+  tagFilters.innerHTML = allTags.map(tag =>
+    `<button class="filter-btn${tag === '全部' ? ' active' : ''}" data-tag="${tag}">${tag}</button>`
+  ).join('');
+  tagFilters.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      tagFilters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterBooks(btn.dataset.tag);
+    });
+  });
+}
+
+function filterBooks(tag) {
+  filteredBooks = tag === '全部' ? [...books] : books.filter(b => b.tags.includes(tag));
+  renderBooks();
+}
+
+function renderBooks() {
+  if (filteredBooks.length === 0) {
+    booksGrid.innerHTML = '';
+    bookEmpty.style.display = 'block';
+    return;
+  }
+  bookEmpty.style.display = 'none';
+  booksGrid.innerHTML = filteredBooks.map((book, idx) => {
+    const isLong = book.notes.length > 100;
+    const preview = isLong ? book.notes.slice(0, 100) + '……' : book.notes;
+    return `
+      <div class="book-card fade-in">
+        <h3>《${book.title}》</h3>
+        <p class="book-author">${book.author}</p>
+        <div class="tags">
+          ${book.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+        </div>
+        <div class="content">
+          <span class="preview-text">${preview}</span>
+          ${isLong ? `<span class="full-text" style="display:none">${book.notes}</span>` : ''}
+        </div>
+        ${isLong ? `<button class="toggle-btn" onclick="toggleBook(this)">展开全文 ▼</button>` : ''}
+      </div>
+    `;
+  });
+}
+
+function toggleBook(btn) {
+  const card = btn.parentElement;
+  const preview = card.querySelector('.preview-text');
+  const full = card.querySelector('.full-text');
+  if (full.style.display === 'none') {
+    preview.style.display = 'none';
+    full.style.display = 'inline';
+    btn.textContent = '收起 ▲';
+  } else {
+    preview.style.display = 'inline';
+    full.style.display = 'none';
+    btn.textContent = '展开全文 ▼';
+  }
+}
+
+// 加载数据
+fetch('data/books.json')
+  .then(r => r.json())
+  .then(data => {
+    books = data.entries || [];
+    renderTagFilters();
+    filterBooks('全部');
+  })
+  .catch(() => { bookEmpty.style.display = 'block'; });
+</script>
+
+</body>
+</html>
