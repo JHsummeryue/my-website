@@ -27,152 +27,62 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loader h2 { font-size: 20px; letter-spacing: 2px; margin-bottom: 6px; font-weight: 300; }
     .loader p { font-size: 14px; color: #888; }
-    .loader .hint {
-      margin-top: 20px;
-      font-size: 13px;
-      color: #aaa;
-      max-width: 320px;
-      line-height: 1.6;
-    }
-    .loader .hint a { color: #666; }
 
     /* ==========================================
        Decap CMS 界面自定义样式
+       让 Content/Media 标签栏更紧凑
        ========================================== */
 
-    /* --- Tab 栏全方位压缩 --- */
-    /* 通过属性选择器尽可能命中 tab 元素 */
+    /* 编辑器标签栏整体压缩 */
     [role="tablist"] {
-      padding: 2px 6px !important;
       gap: 2px !important;
-      min-height: 30px !important;
+      padding: 4px 8px !important;
       background: #fafafa !important;
+      border-bottom: 1px solid #eee !important;
+      min-height: 36px !important;
     }
-    [role="tablist"] [role="tab"],
-    [role="tablist"] button {
-      font-size: 11px !important;
-      padding: 2px 10px !important;
-      min-height: 24px !important;
-      line-height: 1.2 !important;
-      border-radius: 4px !important;
+
+    [role="tab"] {
+      font-size: 12px !important;
+      padding: 4px 14px !important;
+      border-radius: 6px !important;
+      min-height: 28px !important;
+      line-height: 1 !important;
+      background: transparent !important;
+      border: none !important;
+      color: #666 !important;
+      font-weight: 400 !important;
     }
-    /* 命中 CSS Module 风格的 class 名（包含 tab 关键字的） */
-    [class*="tab"] [class*="button"],
-    [class*="Tab"] [class*="Button"],
-    [class*="tabBar"],
-    [class*="TabBar"] {
-      font-size: 11px !important;
-      padding: 2px 10px !important;
-      min-height: 24px !important;
+
+    [role="tab"][aria-selected="true"] {
+      background: #1a1a1a !important;
+      color: #fff !important;
+      font-weight: 500 !important;
     }
-    /* 压缩容器 */
-    [class*="tabBar"],
-    [class*="TabBar"],
-    [class*="toolbar"],
+
+    /* 编辑器工具栏精简 */
     [class*="Toolbar"] {
-      padding: 2px 6px !important;
-      gap: 2px !important;
-      min-height: 30px !important;
-      background: #fafafa !important;
+      padding: 4px 8px !important;
+      min-height: 36px !important;
     }
-    /* 隐藏 Container/Media 底部分割线 */
-    [class*="editor"] [class*="bar"],
-    [class*="Editor"] [class*="Bar"] {
-      border-bottom: none !important;
+
+    /* 编辑器主体区域 */
+    [role="tabpanel"] {
+      padding: 12px !important;
     }
   </style>
 </head>
 <body>
-  <div class="loader" id="loader">
+  <div class="loader">
     <div class="spinner"></div>
     <h2>管理后台</h2>
     <p>正在加载...</p>
-    <div class="hint" id="loadHint" style="display:none;">
-      <p>加载时间较长？请确认：</p>
-      <p>1. 在 Netlify → Site settings → Identity 中开启了 Git Gateway</p>
-      <p>2. 已在 Netlify Identity 中邀请自己并设置了密码</p>
-      <p><a href="https://app.netlify.com/" target="_blank">前往 Netlify →</a></p>
-    </div>
   </div>
 
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
 
   <script>
-    // =============================================
-    // CMS 加载超时提示
-    // =============================================
-    setTimeout(function() {
-      var loader = document.getElementById('loader');
-      if (loader && loader.style.display !== 'none') {
-        document.getElementById('loadHint').style.display = 'block';
-      }
-    }, 15000);
-
-    // =============================================
-    // CMS 界面优化 —— 自动压缩 Content/Media 标签栏
-    // 兼容中英文界面
-    // =============================================
-    (function() {
-      var TAB_TEXTS = ['Content', 'Media', '内容', '媒体'];
-
-      function compactTabs() {
-        var allBtns = document.querySelectorAll('button');
-        var tabParent = null;
-        var found = false;
-
-        for (var i = 0; i < allBtns.length; i++) {
-          var b = allBtns[i];
-          var text = b.textContent.trim();
-          if (TAB_TEXTS.indexOf(text) !== -1) {
-            b.style.setProperty('font-size', '11px', 'important');
-            b.style.setProperty('padding', '2px 10px', 'important');
-            b.style.setProperty('min-height', '24px', 'important');
-            b.style.setProperty('line-height', '1.2', 'important');
-            b.style.setProperty('border-radius', '4px', 'important');
-            if (!tabParent) tabParent = b.parentElement;
-            found = true;
-          }
-        }
-
-        if (tabParent) {
-          tabParent.style.setProperty('padding', '2px 6px', 'important');
-          tabParent.style.setProperty('gap', '2px', 'important');
-          tabParent.style.setProperty('min-height', '30px', 'important');
-          tabParent.style.setProperty('background', '#fafafa', 'important');
-          if (tabParent.parentElement) {
-            tabParent.parentElement.style.setProperty('border-bottom', 'none', 'important');
-          }
-        }
-        return found;
-      }
-
-      // 持续监控 DOM 变化（CMS 异步渲染）
-      var observer = new MutationObserver(function() {
-        compactTabs();
-      });
-      observer.observe(document.body, { childList: true, subtree: true, attributes: false });
-
-      // 轮询后备
-      var maxTry = 40;
-      var tried = 0;
-      function poll() {
-        tried++;
-        if (!compactTabs() && tried < maxTry) {
-          setTimeout(poll, 1000);
-        }
-      }
-      setTimeout(poll, 1000);
-      setTimeout(poll, 3000);
-      setTimeout(poll, 6000);
-
-      // 30 秒后停止观察
-      setTimeout(function() { observer.disconnect(); }, 30000);
-    })();
-
-    // =============================================
-    // Netlify Identity 登录处理
-    // =============================================
     if (window.netlifyIdentity) {
       window.netlifyIdentity.on('init', function(user) {
         if (!user) {

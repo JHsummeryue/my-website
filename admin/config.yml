@@ -9,9 +9,6 @@ backend:
   name: git-gateway
   branch: main
 
-# 界面语言
-locale: 'zh_Hans'
-
 # 照片上传设置：上传到 photos/ 文件夹
 media_folder: 'photos'
 public_folder: '/photos'
@@ -39,7 +36,6 @@ collections:
           - label: '照片列表'
             name: 'entries'
             widget: 'list'
-            summary: '{{fields.title}} · {{fields.date}}'
             hint: '添加、删除或编辑照片'
             fields:
               - { label: '标题', name: 'title', widget: 'string', hint: '照片的名称' }
@@ -64,7 +60,6 @@ collections:
           - label: '摘抄列表'
             name: 'entries'
             widget: 'list'
-            summary: '{{fields.title}} · {{fields.author}}'
             hint: '添加、删除或编辑摘抄'
             fields:
               - { label: '书名', name: 'title', widget: 'string' }
@@ -88,7 +83,6 @@ collections:
           - label: '日记列表'
             name: 'entries'
             widget: 'list'
-            summary: '{{fields.date}} · {{fields.title}}'
             hint: '添加、删除或编辑日记'
             fields:
               - { label: '日期', name: 'date', widget: 'date', format: 'YYYY-MM-DD', date_format: 'YYYY-MM-DD' }
