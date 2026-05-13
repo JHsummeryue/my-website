@@ -40,7 +40,7 @@
        Decap CMS 界面自定义
        ========================================== */
 
-    /* Tab 栏全面压制：尝试所有可能的选择器 */
+    /* Tab 栏全面压制 */
     [role="tablist"],
     [role="tab"] {
       display: none !important;
@@ -50,22 +50,6 @@
     [class*="tabbar"],
     [class*="tabs"],
     [class*="Tabs"] {
-      display: none !important;
-    }
-    [class*="editor"] [class*="toggle"],
-    [class*="Editor"] [class*="Toggle"] {
-      display: none !important;
-    }
-    /* 把所有 toolbar 里可能包含 tab 的都隐藏 */
-    [class*="toolbar"] [class*="tab"],
-    [class*="Toolbar"] [class*="Tab"] {
-      display: none !important;
-    }
-    /* 命中有 "内容" 或 "媒体" 字样的按钮容器 */
-    :is(button, a, [role="tab"])[class*="content"],
-    :is(button, a, [role="tab"])[class*="media"],
-    :is(button, a, [role="tab"])[class*="Content"],
-    :is(button, a, [role="tab"])[class*="Media"] {
       display: none !important;
     }
   </style>
@@ -104,6 +88,39 @@
     (function() {
       var TAB_TEXTS = ['Content', 'Media', '内容', '媒体'];
 
+      // 子串匹配：检查 text 是否包含任一 Tab 关键词
+      function matchesTab(text) {
+        for (var i = 0; i < TAB_TEXTS.length; i++) {
+          if (text.indexOf(TAB_TEXTS[i]) !== -1) return true;
+        }
+        return false;
+      }
+
+      // 隐藏单个元素及其空容器
+      function hideElement(el) {
+        el.style.setProperty('display', 'none', 'important');
+        // 如果父容器空了，也隐藏它
+        var p = el.parentElement;
+        if (p) {
+          var allHidden = true;
+          for (var i = 0; i < p.children.length; i++) {
+            if (p.children[i].style.display !== 'none' &&
+                window.getComputedStyle(p.children[i]).display !== 'none') {
+              allHidden = false;
+              break;
+            }
+          }
+          if (allHidden) {
+            p.style.setProperty('display', 'none', 'important');
+            // 再检查上一级
+            var gp = p.parentElement;
+            if (gp && gp.children.length <= 2) {
+              gp.style.setProperty('display', 'none', 'important');
+            }
+          }
+        }
+      }
+
       // 从根元素往下递归搜索含有 Tab 文本的节点
       function findTabNodes(root) {
         var found = [];
@@ -111,130 +128,97 @@
 
         for (var i = 0; i < root.children.length; i++) {
           var child = root.children[i];
-          // 只查看叶子文本节点或直接包含文本的元素
           var text = child.textContent.trim();
-          if (TAB_TEXTS.indexOf(text) !== -1) {
+          if (matchesTab(text) && text.length < 30) {
             found.push(child);
-            continue; // 已经找到了，不需要往下搜索
+            continue;
           }
-          // 递归
           var deeper = findTabNodes(child);
           found = found.concat(deeper);
         }
         return found;
       }
 
-      // 尝试隐藏 Tab 栏
-      function hideTabs() {
-        // 策略1: 按角色查找
-        var byRole = document.querySelectorAll('[role="tab"], [role="tablist"]');
-        for (var i = 0; i < byRole.length; i++) {
-          if (byRole[i].textContent.trim().length < 20) {
-            byRole[i].style.setProperty('display', 'none', 'important');
+      // 策略1: 按角色查找并隐藏容器
+      function hideByRole() {
+        var found = false;
+        var tabs = document.querySelectorAll('[role="tab"], [role="tablist"]');
+        for (var i = 0; i < tabs.length; i++) {
+          if (tabs[i].textContent.trim().length < 30) {
+            hideElement(tabs[i]);
+            found = true;
           }
         }
+        // 也查找 aria-label
+        var byLabel = document.querySelectorAll('[aria-label*="Content"],[aria-label*="Media"],[aria-label*="内容"],[aria-label*="媒体"]');
+        for (var i = 0; i < byLabel.length; i++) {
+          hideElement(byLabel[i]);
+          found = true;
+        }
+        return found;
+      }
 
-        // 策略2: 按文本搜索所有元素
-        var all = document.querySelectorAll('button, a, span, div, [role="tab"]');
+      // 策略2: 按文本搜索 + 隐藏容器
+      function hideByText() {
+        var all = document.querySelectorAll('*');
         var tabNodes = [];
         for (var i = 0; i < all.length; i++) {
           var t = all[i].textContent.trim();
-          if (TAB_TEXTS.indexOf(t) !== -1) {
+          if (matchesTab(t) && t.length < 30) {
             tabNodes.push(all[i]);
           }
         }
 
-        // 如果找到了 tab 按钮，隐藏它们的共同父容器
-        if (tabNodes.length >= 2) {
-          var parent = tabNodes[0].parentElement;
-          // 验证所有 tab 节点是否在同一父容器下
-          var sameParent = true;
-          for (var i = 1; i < tabNodes.length; i++) {
-            if (tabNodes[i].parentElement !== parent) {
-              sameParent = false;
-              break;
-            }
-          }
-          if (sameParent && parent) {
-            parent.style.setProperty('display', 'none', 'important');
-            // 也隐藏父容器的父容器（有些 CMS 容器有一层 wrapper）
-            if (parent.parentElement &&
-                parent.parentElement.children.length <= 3 &&
-                parent.parentElement.children.length >= 1) {
-              parent.parentElement.style.setProperty('display', 'none', 'important');
-            }
-            return true;
-          } else {
-            // 不在同一父容器，各自隐藏
-            for (var i = 0; i < tabNodes.length; i++) {
-              tabNodes[i].style.setProperty('display', 'none', 'important');
-            }
-            return true;
-          }
-        } else if (tabNodes.length === 1) {
-          // 只找到一个，隐藏它和它的父容器
-          tabNodes[0].style.setProperty('display', 'none', 'important');
-          var p = tabNodes[0].parentElement;
-          if (p && p.children.length <= 3) {
-            p.style.setProperty('display', 'none', 'important');
-          }
-          return true;
+        if (tabNodes.length === 0) return false;
+
+        // 先隐藏所有找到的 tab 节点
+        for (var i = 0; i < tabNodes.length; i++) {
+          hideElement(tabNodes[i]);
         }
-        return false;
+
+        // 再检查是否共享父容器
+        var parent = tabNodes[0].parentElement;
+        var sameParent = true;
+        for (var i = 1; i < tabNodes.length; i++) {
+          if (tabNodes[i].parentElement !== parent) { sameParent = false; break; }
+        }
+        if (sameParent && parent) {
+          parent.style.setProperty('display', 'none', 'important');
+        }
+        return true;
       }
 
-      // 策略3: 深搜整个 body，找到所有 tab 节点并隐藏
-      function deepSearchAndHide() {
-        var tabEls = findTabNodes(document.body);
-        if (tabEls.length >= 2) {
-          var parent = tabEls[0].parentElement;
-          var sameParent = true;
-          for (var i = 1; i < tabEls.length; i++) {
-            if (tabEls[i].parentElement !== parent) {
-              sameParent = false;
-              break;
-            }
-          }
-          if (sameParent && parent) {
-            parent.style.setProperty('display', 'none', 'important');
-          } else {
-            for (var i = 0; i < tabEls.length; i++) tabEls[i].style.setProperty('display', 'none', 'important');
-          }
-          return true;
-        } else if (tabEls.length === 1) {
-          tabEls[0].style.setProperty('display', 'none', 'important');
-          return true;
-        }
-        return false;
+      // 执行所有策略
+      function hideAllTabs() {
+        var r1 = hideByRole();
+        var r2 = hideByText();
+        return r1 || r2;
       }
 
       // --- 监控 DOM 变化 ---
       var observer = new MutationObserver(function() {
-        hideTabs();
-        deepSearchAndHide();
+        hideAllTabs();
       });
       observer.observe(document.body, { childList: true, subtree: true, attributes: false });
 
       // --- 持续轮询 ---
-      var maxTry = 60;
+      var maxTry = 80;
       var tried = 0;
       function poll() {
         tried++;
-        var h1 = hideTabs();
-        var h2 = deepSearchAndHide();
-        if ((!h1 && !h2) && tried < maxTry) {
-          setTimeout(poll, 1000);
-        } else if (h1 || h2) {
-          // 成功后每 5 秒再检查一次（CMS 会重新渲染）
-          setTimeout(poll, 5000);
+        if (!hideAllTabs() && tried < maxTry) {
+          setTimeout(poll, 500);
+        } else if (tried < maxTry) {
+          setTimeout(poll, 3000);
         }
       }
-      setTimeout(poll, 500);
-      setTimeout(poll, 2000);
-      setTimeout(poll, 5000);
+      setTimeout(poll, 300);
+      setTimeout(poll, 1000);
+      setTimeout(poll, 3000);
+      setTimeout(poll, 6000);
 
-      // 60 秒后停止观察
-      setTimeout(function() { observer.disconnect(); }, 60000);
+      // 90 秒后停止观察
+      setTimeout(function() { observer.disconnect(); }, 90000);
     })();
 
     // =============================================
