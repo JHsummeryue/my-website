@@ -11,14 +11,14 @@
 }
 
 :root {
-  --bg: #faf7f2;
+  --bg: #f5f5f5;
   --bg-card: #ffffff;
-  --text: #2d2d2d;
-  --text-light: #999080;
-  --accent: #9a8a7a;
-  --accent-hover: #7a6b5a;
-  --border: #e8e0d8;
-  --shadow: rgba(0,0,0,0.06);
+  --text: #1a1a1a;
+  --text-light: #888888;
+  --accent: #333333;
+  --accent-hover: #000000;
+  --border: #dddddd;
+  --shadow: rgba(0,0,0,0.08);
   --radius: 12px;
 }
 
@@ -49,7 +49,7 @@ nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(250, 247, 242, 0.92);
+  background: rgba(245, 245, 245, 0.92);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;
@@ -250,7 +250,7 @@ footer {
   overflow: hidden;
   cursor: pointer;
   height: 280px;
-  background: #f0ebe3;
+  background: #eeeeee;
 }
 
 .photo-item img {
@@ -564,4 +564,256 @@ footer {
 
   .timeline { padding-left: 32px; }
   .timeline-item { padding-left: 16px; }
+}
+
+/* ============================================
+   首页 - 照片轮播 Hero
+   ============================================ */
+
+.hero-slideshow {
+  position: relative;
+  width: 100%;
+  height: 86vh;
+  min-height: 480px;
+  max-height: 880px;
+  overflow: hidden;
+  background: #2d2d2d;
+}
+
+.slideshow-inner {
+  position: absolute;
+  inset: 0;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+.slide.active { opacity: 1; }
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: kenBurns 14s ease-out forwards;
+}
+@keyframes kenBurns {
+  0%   { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.slideshow-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,   rgba(0,0,0,0.6) 0%,
+            rgba(0,0,0,0.2) 45%,
+            transparent 75%
+  );
+  z-index: 1;
+}
+
+.slideshow-content {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 60px 24px 80px;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+}
+
+.slideshow-content h1 {
+  font-size: 42px;
+  font-weight: 300;
+  letter-spacing: 6px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  margin-bottom: 10px;
+}
+
+.slideshow-content .tagline {
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  opacity: 0.8;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.3);
+}
+
+/* --- 每日名言 --- */
+.daily-quote {
+  margin: 36px auto 0;
+  max-width: 540px;
+  padding: 20px 28px;
+  border-left: 3px solid rgba(255,255,255,0.3);
+  text-align: left;
+  animation: quoteIn 0.8s ease 0.4s both;
+}
+@keyframes quoteIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.daily-quote blockquote {
+  font-size: 16px;
+  line-height: 1.9;
+  font-weight: 300;
+  opacity: 0.92;
+}
+.daily-quote cite {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.55;
+  font-style: normal;
+  letter-spacing: 1px;
+}
+
+/* --- 轮播指示点 --- */
+.slideshow-nav {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 6px;
+}
+.slideshow-nav .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  transition: all 0.4s;
+  cursor: pointer;
+}
+.slideshow-nav .dot.active {
+  background: #fff;
+  width: 20px;
+  border-radius: 3px;
+}
+
+/* ============================================
+   滚动触发的入场动画
+   ============================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-d1 { transition-delay: 0.05s; }
+.reveal-d2 { transition-delay: 0.15s; }
+.reveal-d3 { transition-delay: 0.25s; }
+.reveal-d4 { transition-delay: 0.35s; }
+
+/* ============================================
+   整体页面入场
+   ============================================ */
+
+.page-enter {
+  animation: pageIn 0.4s ease both;
+}
+@keyframes pageIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ============================================
+   照片网格增强
+   ============================================ */
+
+.photo-item {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: box-shadow 0.4s, transform 0.4s;
+}
+.photo-item:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+}
+
+/* ============================================
+   首页卡片（悬浮透明质感）
+   ============================================ */
+
+.home-cards {
+  max-width: 820px;
+  margin: -50px auto 80px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.home-card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(232,224,216,0.6);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 36px 24px;
+  text-align: center;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: block;
+  color: var(--text);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.home-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+  color: var(--text);
+}
+.home-card .icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  display: block;
+}
+.home-card h3 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.home-card p {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.about-section {
+  max-width: 600px;
+  margin: 0 auto 80px;
+  text-align: center;
+  padding: 0 24px;
+}
+.about-section h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+.about-section p {
+  font-size: 15px;
+  color: var(--text-light);
+  line-height: 2;
+}
+
+/* ============================================
+   响应式补充
+   ============================================ */
+
+@media (max-width: 768px) {
+  .hero-slideshow { height: 75vh; min-height: 400px; }
+  .slideshow-content h1 { font-size: 28px; letter-spacing: 4px; }
+  .slideshow-content { padding-bottom: 56px; }
+  .slideshow-nav { bottom: 16px; }
+  .home-cards { grid-template-columns: 1fr; max-width: 400px; }
+}
+
+@media (max-width: 640px) {
+  .home-cards { margin-top: -30px; }
+  .slideshow-content h1 { font-size: 24px; }
+  .daily-quote { padding: 14px 18px; margin-top: 24px; }
+  .daily-quote blockquote { font-size: 14px; }
 }
