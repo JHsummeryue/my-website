@@ -8,25 +8,68 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: #faf7f2;
+      background: #f5f5f5;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      color: #2d2d2d;
+      color: #1a1a1a;
     }
     .loader { text-align: center; }
     .loader .spinner {
       width: 36px; height: 36px;
-      border: 3px solid #e8e0d8;
-      border-top-color: #9a8a7a;
+      border: 3px solid #ddd;
+      border-top-color: #333;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 0 auto 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loader h2 { font-size: 20px; letter-spacing: 2px; margin-bottom: 6px; }
-    .loader p { font-size: 14px; color: #999080; }
+    .loader h2 { font-size: 20px; letter-spacing: 2px; margin-bottom: 6px; font-weight: 300; }
+    .loader p { font-size: 14px; color: #888; }
+
+    /* ==========================================
+       Decap CMS 界面自定义样式
+       让 Content/Media 标签栏更紧凑
+       ========================================== */
+
+    /* 编辑器标签栏整体压缩 */
+    [role="tablist"] {
+      gap: 2px !important;
+      padding: 4px 8px !important;
+      background: #fafafa !important;
+      border-bottom: 1px solid #eee !important;
+      min-height: 36px !important;
+    }
+
+    [role="tab"] {
+      font-size: 12px !important;
+      padding: 4px 14px !important;
+      border-radius: 6px !important;
+      min-height: 28px !important;
+      line-height: 1 !important;
+      background: transparent !important;
+      border: none !important;
+      color: #666 !important;
+      font-weight: 400 !important;
+    }
+
+    [role="tab"][aria-selected="true"] {
+      background: #1a1a1a !important;
+      color: #fff !important;
+      font-weight: 500 !important;
+    }
+
+    /* 编辑器工具栏精简 */
+    [class*="Toolbar"] {
+      padding: 4px 8px !important;
+      min-height: 36px !important;
+    }
+
+    /* 编辑器主体区域 */
+    [role="tabpanel"] {
+      padding: 12px !important;
+    }
   </style>
 </head>
 <body>
@@ -36,13 +79,9 @@
     <p>正在加载...</p>
   </div>
 
-  <!-- Netlify Identity（用于登录认证） -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-  <!-- Decap CMS（网站内容管理系统） -->
   <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
 
-  <!-- 处理登录后的重定向 -->
   <script>
     if (window.netlifyIdentity) {
       window.netlifyIdentity.on('init', function(user) {
