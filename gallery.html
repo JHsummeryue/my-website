@@ -170,6 +170,8 @@ fetch('data/photos.json')
   .then(r => r.json())
   .then(data => {
     photos = data.entries || [];
+    // 兼容分类字段可能存为数组的情况
+    photos.forEach(p => { if (Array.isArray(p.category)) p.category = p.category[0]; });
     renderFilters();
     filterPhotos('全部');
   })
