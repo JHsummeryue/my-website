@@ -1,9 +1,7 @@
 {
   "entries": [
     {
-      "category": [
-        "风景"
-      ],
+      "category": "静物",
       "file": "/photos/67a01467.jpg",
       "title": "花-微距"
     },
@@ -61,6 +59,61 @@
       "category": "静物",
       "file": "/photos/795c0e43c1c731b3afeda4d87196a809.jpg",
       "title": "摄影"
+    },
+    {
+      "category": "风景",
+      "file": "/photos/973ec30e5b960e882f7edcc3d97ad4e7.jpg",
+      "title": "夏日黄昏"
+    },
+    {
+      "category": "静物",
+      "file": "/photos/2687d2f921fef594e1d103a1b37debdd.jpg",
+      "title": "光与影"
+    },
+    {
+      "category": "人像",
+      "file": "/photos/3923c6aee21fb11a59f299d81d754dc7.jpg",
+      "title": "执手相看灯火"
+    },
+    {
+      "category": "风景",
+      "file": "/photos/7751e7dad9858be9e253bfba337e7843.jpg",
+      "title": "天平入秋色"
+    },
+    {
+      "category": "静物",
+      "file": "/photos/505576bc0f5267c215a30fd61ea4d3e7.jpg",
+      "title": "典雅"
+    },
+    {
+      "category": "静物",
+      "file": "/photos/5539444632951638913367e0f3face68.jpg",
+      "title": "春秋笔墨"
+    },
+    {
+      "category": "旅行",
+      "file": "/photos/a991867aabe436213471040762fd7354.jpg",
+      "title": "千本鸟居"
+    },
+    {
+      "category": "旅行",
+      "file": "/photos/b2cc594d6a9bbbf45cc87413a809d635.jpg",
+      "title": "云间"
+    },
+    {
+      "category": "静物",
+      "file": "/photos/b6b1e07a2482214f0fe9acf5c9172637.jpg",
+      "title": "路过人间"
+    },
+    {
+      "category": "街拍",
+      "file": "/photos/ba40337031616399c250dcac62daa5b5.jpg",
+      "title": "徽派"
+    },
+    {
+      "category": "静物",
+      "file": "/photos/c7b86ba71dd2c6d7f64190bfab1d5df9.jpg",
+      "title": "高冷的猫"
     }
   ]
 }
